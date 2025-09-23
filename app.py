@@ -17,7 +17,7 @@ st.set_page_config(
 def load_model():
     """Load the trained model (cached to avoid reloading)"""
     # Load your model from Google Drive
-    model_path = "/content/drive/MyDrive/Colab-Notebooks/skin-lesion/skin_lesion_model_final.keras"
+    model_path = "model/skin_lesion_model_final.keras"
 
     # Re-define focal loss for loading
     def focal_loss(alpha=0.25, gamma=2.0):
