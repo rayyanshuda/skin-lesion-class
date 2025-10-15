@@ -1,4 +1,4 @@
-# skin-lesion-class
+# Skin Lesion Detection with Deep Learning
 A deep learning project that classifies skin lesions as **benign** or **malignant** using a RestNet50 CNN and a custom focal loss function to handle class imbalance. Includes Grad-CAM visualizations for model explainability and a Streamlit web app for real-time predictions.  
 
 ### View the app here: -> [https://skin-lesion-class.streamlit.app/](https://skin-lesion-class.streamlit.app/)
