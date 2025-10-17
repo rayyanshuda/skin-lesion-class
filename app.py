@@ -76,6 +76,10 @@ def process_image(uploaded_image, model):
     if not isinstance(uploaded_image, Image.Image):
         uploaded_image = Image.open(uploaded_image)
 
+    # Ensure image is RGB (fixes RGBA/grayscale uploads)
+    if uploaded_image.mode != 'RGB':
+        uploaded_image = uploaded_image.convert('RGB')
+
     # Resize and preprocess
     img_resized = uploaded_image.resize((224, 224))
     img_array = np.array(img_resized) / 255.0
