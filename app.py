@@ -16,7 +16,7 @@ st.set_page_config(
 @st.cache_resource
 def load_model():
     """Load the trained model (cached to avoid reloading)"""
-    # Load your model from Google Drive
+    # Load model from Google Drive
     model_path = "model/skin_lesion_model_final.keras"
 
     # Re-define focal loss for loading
@@ -76,7 +76,7 @@ def process_image(uploaded_image, model):
     if not isinstance(uploaded_image, Image.Image):
         uploaded_image = Image.open(uploaded_image)
 
-    # Ensure image is RGB (fixes RGBA/grayscale uploads)
+    # Make sure image is RGB (fixes RGBA/grayscale uploads)
     if uploaded_image.mode != 'RGB':
         uploaded_image = uploaded_image.convert('RGB')
 
@@ -107,7 +107,7 @@ def main():
     st.title("🔬 Skin Lesion AI Classifier")
     st.markdown("### Upload a skin lesion image for AI analysis")
 
-    # Important disclaimer
+    # medical disclaimer
     st.error("""
     ⚠️ **MEDICAL DISCLAIMER**: This is a research prototype only.
     NOT for medical diagnosis. Always consult healthcare professionals for medical advice.
