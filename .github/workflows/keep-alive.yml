@@ -12,6 +12,6 @@ jobs:
     steps:
       - name: Ping Streamlit App
         run: |
-          echo "🏓 Pinging app at $(date)"
+          echo "pinging app at $(date)"
           curl -I https://skin-lesion-class.streamlit.app/
-          echo "✅ Ping complete"
+          echo "ping complete"
