@@ -8,7 +8,7 @@ import io
 
 # Configure page
 st.set_page_config(
-    page_title="Skin Lesion AI Classifier",
+    page_title="Skin Lesion Classifier",
     page_icon="🔬",
     layout="wide"
 )
@@ -104,7 +104,7 @@ def process_image(uploaded_image, model):
 
 # Main app
 def main():
-    st.title("🔬 Skin Lesion AI Classifier")
+    st.title("Skin Lesion Classifier")
     st.markdown("### Upload a skin lesion image for AI analysis")
 
     # medical disclaimer
@@ -116,9 +116,9 @@ def main():
     # Load model
     try:
         model = load_model()
-        st.success("✅ Model loaded successfully!")
+        st.success("Model loaded successfully!")
     except Exception as e:
-        st.error(f"❌ Error loading model: {str(e)}")
+        st.error(f"Error loading model: {str(e)}")
         st.stop()
 
     # File uploader
@@ -168,14 +168,14 @@ def main():
 
                 # Certainty interpretation with clearer logic
                 if certainty > 0.6:  # >80% or <20% malignancy prob
-                    st.info("🎯 High certainty prediction")
+                    st.info("High certainty prediction")
                 elif certainty > 0.2:  # 60-80% or 20-40% malignancy prob
-                    st.warning("⚠️ Moderate certainty")
+                    st.warning("Moderate certainty")
                 else:  # 40-60% malignancy prob
-                    st.error("❓ Low certainty - uncertain prediction")
+                    st.error("Low certainty - uncertain prediction")
 
             with col2:
-                st.subheader("🖼️ Visual Analysis")
+                st.subheader("Visual Analysis")
 
                 # Create three columns for images
                 img_col1, img_col2, img_col3 = st.columns(3)
@@ -211,7 +211,7 @@ def main():
             """)
 
         except Exception as e:
-            st.error(f"❌ Error processing image: {str(e)}")
+            st.error(f"Error processing image: {str(e)}")
 
 if __name__ == "__main__":
     main()
