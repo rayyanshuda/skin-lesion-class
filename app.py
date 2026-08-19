@@ -74,8 +74,8 @@ def inject_theme():
         border-bottom: 1px solid var(--divider);
     }
     .stMarkdown p, .stMarkdown li, .stMarkdown ol, .stMarkdown ul {
-        font-size: 16px !important;
-        line-height: 1.65 !important;
+        font-size: 18px !important;
+        line-height: 1.7 !important;
     }
     .stApp a {
         color: var(--text) !important;
@@ -134,6 +134,22 @@ def inject_theme():
         width: auto !important;
         min-height: 0 !important;
     }
+    /* the "Browse files" button's icon+label were overlapping once the shared
+       button rule above gave it padding/min-height it wasn't laid out for;
+       force it into a normal flex row so icon and label sit side by side */
+    [data-testid="stFileUploaderDropzone"] button {
+        position: relative !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        padding: 6px 16px !important;
+        min-height: 2.2em !important;
+        white-space: nowrap !important;
+    }
+    [data-testid="stFileUploaderDropzone"] button * {
+        position: static !important;
+    }
 
     /* metrics */
     [data-testid="stMetric"] {
@@ -159,25 +175,25 @@ def inject_theme():
     [data-testid="stAlert"] {
         border-radius: 0 !important;
         border: 1px solid var(--divider) !important;
-        background: var(--hover-surface) !important;
+        background: #eecfc1 !important;
     }
     [data-testid="stAlert"] p, [data-testid="stAlert"] span {
-        font-size: 16px !important;
+        font-size: 18px !important;
     }
     [data-testid="stAlertContentError"] {
-        background: #f0d7cc !important;
+        background: #eecfc1 !important;
         border-left: 3px solid #a5493a !important;
     }
     [data-testid="stAlertContentSuccess"] {
-        background: #dde6d1 !important;
+        background: #eecfc1 !important;
         border-left: 3px solid #5f7a4f !important;
     }
     [data-testid="stAlertContentWarning"] {
-        background: #f2e4c3 !important;
+        background: #eecfc1 !important;
         border-left: 3px solid #a67c2e !important;
     }
     [data-testid="stAlertContentInfo"] {
-        background: var(--hover-surface) !important;
+        background: #eecfc1 !important;
         border-left: 3px solid var(--underline) !important;
     }
 
@@ -281,6 +297,7 @@ def process_image(uploaded_image, model):
     heatmap_resized = cv2.resize(heatmap, (224, 224))
     heatmap_colored = np.uint8(255 * heatmap_resized)
     heatmap_colored = cv2.applyColorMap(heatmap_colored, cv2.COLORMAP_JET)
+    heatmap_colored = cv2.cvtColor(heatmap_colored, cv2.COLOR_BGR2RGB)
     overlay = cv2.addWeighted(img_for_overlay, 0.6, heatmap_colored, 0.4, 0)
 
     return pred_label, confidence, heatmap_resized, overlay, img_for_overlay
@@ -371,6 +388,7 @@ def main():
                 with img_col2:
                     # Colorize the same way the overlay does, so all three panels match in size/crop
                     heatmap_display = cv2.applyColorMap(np.uint8(255 * heatmap), cv2.COLORMAP_JET)
+                    heatmap_display = cv2.cvtColor(heatmap_display, cv2.COLOR_BGR2RGB)
                     st.image(heatmap_display, caption="Grad-CAM Heatmap", use_container_width=True)
 
                 with img_col3:
