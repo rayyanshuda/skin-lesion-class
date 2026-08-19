@@ -124,6 +124,7 @@ def inject_theme():
     [data-testid="stFileUploaderDropzone"] * {
         color: var(--muted) !important;
         font-family: "Spline Sans Mono", monospace !important;
+        position: static !important;
     }
     [data-testid="stFileUploaderDropzone"] svg {
         color: var(--muted) !important;
@@ -134,21 +135,19 @@ def inject_theme():
         width: auto !important;
         min-height: 0 !important;
     }
-    /* the "Browse files" button's icon+label were overlapping once the shared
-       button rule above gave it padding/min-height it wasn't laid out for;
-       force it into a normal flex row so icon and label sit side by side */
-    [data-testid="stFileUploaderDropzone"] button {
-        position: relative !important;
-        display: inline-flex !important;
+    /* the inner drop-area isn't a <button> -- it's Streamlit's own native flex
+       box (its own gray background/radius/padding), so reset it to blend into
+       our outer bordered container instead of nesting a second visible box */
+    [data-testid="stFileUploaderDropzone"] section > div,
+    [data-testid="stFileUploaderDropzone"] > div {
+        background: transparent !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        min-height: 0 !important;
+        display: flex !important;
         align-items: center !important;
-        justify-content: center !important;
-        gap: 8px !important;
-        padding: 6px 16px !important;
-        min-height: 2.2em !important;
-        white-space: nowrap !important;
-    }
-    [data-testid="stFileUploaderDropzone"] button * {
-        position: static !important;
+        gap: 10px !important;
+        flex-wrap: wrap !important;
     }
 
     /* metrics */
@@ -175,25 +174,25 @@ def inject_theme():
     [data-testid="stAlert"] {
         border-radius: 0 !important;
         border: 1px solid var(--divider) !important;
-        background: #eecfc1 !important;
+        background: var(--hover-surface) !important;
     }
     [data-testid="stAlert"] p, [data-testid="stAlert"] span {
         font-size: 18px !important;
     }
     [data-testid="stAlertContentError"] {
-        background: #eecfc1 !important;
+        background: var(--hover-surface) !important;
         border-left: 3px solid #a5493a !important;
     }
     [data-testid="stAlertContentSuccess"] {
-        background: #eecfc1 !important;
+        background: var(--hover-surface) !important;
         border-left: 3px solid #5f7a4f !important;
     }
     [data-testid="stAlertContentWarning"] {
-        background: #eecfc1 !important;
+        background: var(--hover-surface) !important;
         border-left: 3px solid #a67c2e !important;
     }
     [data-testid="stAlertContentInfo"] {
-        background: #eecfc1 !important;
+        background: var(--hover-surface) !important;
         border-left: 3px solid var(--underline) !important;
     }
 
