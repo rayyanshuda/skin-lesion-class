@@ -3,7 +3,6 @@ import tensorflow as tf
 import numpy as np
 import cv2
 from PIL import Image
-import matplotlib.pyplot as plt
 import io
 
 # Configure page
@@ -70,9 +69,13 @@ def inject_theme():
     }
     h1 { font-size: 2.4rem !important; }
     h2, h3 {
-        font-size: 1.15rem !important;
+        font-size: 1.3rem !important;
         padding-bottom: 6px;
         border-bottom: 1px solid var(--divider);
+    }
+    .stMarkdown p, .stMarkdown li, .stMarkdown ol, .stMarkdown ul {
+        font-size: 16px !important;
+        line-height: 1.65 !important;
     }
     .stApp a {
         color: var(--text) !important;
@@ -94,6 +97,8 @@ def inject_theme():
         color: var(--text) !important;
         font-family: "Spectral", Georgia, serif !important;
         box-shadow: none !important;
+        padding: 6px 18px !important;
+        min-height: 2.2em !important;
         transition: border-color 180ms ease, background-color 180ms ease;
     }
     .stButton > button:hover,
@@ -109,10 +114,25 @@ def inject_theme():
         border-radius: 0 !important;
         border: 1px dashed var(--divider) !important;
         background: transparent !important;
+        min-height: 96px !important;
+        padding: 18px 22px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 16px !important;
+        flex-wrap: wrap !important;
     }
     [data-testid="stFileUploaderDropzone"] * {
         color: var(--muted) !important;
         font-family: "Spline Sans Mono", monospace !important;
+    }
+    [data-testid="stFileUploaderDropzone"] svg {
+        color: var(--muted) !important;
+        fill: var(--muted) !important;
+        flex-shrink: 0;
+    }
+    [data-testid="stFileUploaderDropzone"] section {
+        width: auto !important;
+        min-height: 0 !important;
     }
 
     /* metrics */
@@ -139,6 +159,26 @@ def inject_theme():
     [data-testid="stAlert"] {
         border-radius: 0 !important;
         border: 1px solid var(--divider) !important;
+        background: var(--hover-surface) !important;
+    }
+    [data-testid="stAlert"] p, [data-testid="stAlert"] span {
+        font-size: 16px !important;
+    }
+    [data-testid="stAlertContentError"] {
+        background: #f0d7cc !important;
+        border-left: 3px solid #a5493a !important;
+    }
+    [data-testid="stAlertContentSuccess"] {
+        background: #dde6d1 !important;
+        border-left: 3px solid #5f7a4f !important;
+    }
+    [data-testid="stAlertContentWarning"] {
+        background: #f2e4c3 !important;
+        border-left: 3px solid #a67c2e !important;
+    }
+    [data-testid="stAlertContentInfo"] {
+        background: var(--hover-surface) !important;
+        border-left: 3px solid var(--underline) !important;
     }
 
     /* spinner + image captions */
@@ -283,7 +323,7 @@ def main():
             col1, col2 = st.columns([1, 2])
 
             with col1:
-                st.subheader("📊 Prediction Results")
+                st.subheader("Prediction Results")
 
                 # Prediction with color coding
                 if pred_label == "Malignant":
@@ -329,20 +369,15 @@ def main():
                     st.image(original, caption="Original Image", use_container_width=True)
 
                 with img_col2:
-                    # Convert heatmap to displayable format
-                    fig, ax = plt.subplots(figsize=(4, 4))
-                    im = ax.imshow(heatmap, cmap='jet')
-                    ax.axis('off')
-                    ax.set_title('Grad-CAM Heatmap')
-                    plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
-                    st.pyplot(fig)
-                    plt.close()
+                    # Colorize the same way the overlay does, so all three panels match in size/crop
+                    heatmap_display = cv2.applyColorMap(np.uint8(255 * heatmap), cv2.COLORMAP_JET)
+                    st.image(heatmap_display, caption="Grad-CAM Heatmap", use_container_width=True)
 
                 with img_col3:
                     st.image(overlay, caption="Overlay", use_container_width=True)
 
             # Explanation
-            st.subheader("🧠 What is the AI looking at?")
+            st.subheader("What is the AI looking at?")
             st.markdown("""
             The **Grad-CAM heatmap** shows which parts of the image the AI focused on:
             - 🔴 **Red areas**: High importance for the prediction
@@ -360,4 +395,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
