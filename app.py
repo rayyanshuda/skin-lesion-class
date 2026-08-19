@@ -13,6 +13,149 @@ st.set_page_config(
     layout="wide"
 )
 
+def inject_theme():
+    """Restyle Streamlit's default widgets to match rayyanhuda.com's design system
+    (coffee-cream palette, Spectral/Spline Sans Mono typography, flat bordered UI)."""
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap');
+
+    :root {
+        --bg: #f3ece2;
+        --text: #3d2f24;
+        --muted: #7a6454;
+        --divider: #d5c3b0;
+        --underline: #b19479;
+        --underline-hover: #3d2f24;
+        --hover-surface: #ebdfd1;
+        --hover-border: #d6c1ad;
+        --grid-dot: rgba(122, 100, 84, 0.28);
+    }
+
+    /* base canvas + dotted grid backdrop, same recipe as index.html */
+    .stApp {
+        background-color: var(--bg) !important;
+        position: relative;
+    }
+    .stApp::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        font-family: "Spline Sans Mono", monospace;
+        font-size: 15px;
+        background-image: radial-gradient(circle, var(--grid-dot) 0.75px, transparent 0.75px);
+        background-size: 1ch 1ex;
+        background-position: center top;
+    }
+    [data-testid="stAppViewContainer"],
+    [data-testid="stHeader"],
+    .main .block-container {
+        position: relative;
+        z-index: 1;
+        background: transparent !important;
+    }
+
+    /* typography */
+    .stApp, .stApp p, .stApp li, .stApp span, .stApp label, .stMarkdown {
+        font-family: "Spectral", Georgia, serif !important;
+        color: var(--text);
+    }
+    h1, h2, h3 {
+        font-family: "Spectral", Georgia, serif !important;
+        font-weight: 400 !important;
+        letter-spacing: -0.01em;
+        color: var(--text) !important;
+    }
+    h1 { font-size: 2.4rem !important; }
+    h2, h3 {
+        font-size: 1.15rem !important;
+        padding-bottom: 6px;
+        border-bottom: 1px solid var(--divider);
+    }
+    .stApp a {
+        color: var(--text) !important;
+        text-decoration: underline;
+        text-decoration-color: var(--underline);
+        transition: text-decoration-color 180ms ease;
+    }
+    .stApp a:hover {
+        text-decoration-color: var(--underline-hover);
+    }
+
+    /* buttons */
+    .stButton > button,
+    button[kind="secondary"],
+    button[data-testid^="stBaseButton"] {
+        border-radius: 0 !important;
+        border: 1px solid var(--underline) !important;
+        background: transparent !important;
+        color: var(--text) !important;
+        font-family: "Spectral", Georgia, serif !important;
+        box-shadow: none !important;
+        transition: border-color 180ms ease, background-color 180ms ease;
+    }
+    .stButton > button:hover,
+    button[kind="secondary"]:hover,
+    button[data-testid^="stBaseButton"]:hover {
+        border-color: var(--underline-hover) !important;
+        background-color: var(--hover-surface) !important;
+        color: var(--text) !important;
+    }
+
+    /* file uploader */
+    [data-testid="stFileUploaderDropzone"] {
+        border-radius: 0 !important;
+        border: 1px dashed var(--divider) !important;
+        background: transparent !important;
+    }
+    [data-testid="stFileUploaderDropzone"] * {
+        color: var(--muted) !important;
+        font-family: "Spline Sans Mono", monospace !important;
+    }
+
+    /* metrics */
+    [data-testid="stMetric"] {
+        background: transparent !important;
+        border: 1px solid var(--divider);
+        padding: 12px 14px;
+        border-radius: 0;
+    }
+    [data-testid="stMetricLabel"] {
+        font-family: "Spline Sans Mono", monospace !important;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 11px !important;
+        color: var(--muted) !important;
+    }
+    [data-testid="stMetricValue"] {
+        font-family: "Spectral", Georgia, serif !important;
+        color: var(--text) !important;
+    }
+
+    /* alerts (error/success/warning/info) */
+    div[data-baseweb="notification"],
+    [data-testid="stAlert"] {
+        border-radius: 0 !important;
+        border: 1px solid var(--divider) !important;
+    }
+
+    /* spinner + image captions */
+    .stSpinner > div {
+        font-family: "Spline Sans Mono", monospace !important;
+        color: var(--muted) !important;
+    }
+    [data-testid="stImageCaption"] {
+        font-family: "Spline Sans Mono", monospace !important;
+        font-size: 11px !important;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted) !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 @st.cache_resource
 def load_model():
     """Load the trained model (cached to avoid reloading)"""
@@ -104,6 +247,8 @@ def process_image(uploaded_image, model):
 
 # Main app
 def main():
+    inject_theme()
+
     st.title("Skin Lesion Classifier")
     st.markdown("### Upload a skin lesion image for AI analysis")
 
@@ -215,3 +360,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
