@@ -1,7 +1,7 @@
 # Skin Lesion Detection with Deep Learning
-A deep learning project that classifies skin lesions as **benign** or **malignant** using a RestNet50 CNN and a custom focal loss function to handle class imbalance. Includes Grad-CAM visualizations for model explainability and a Streamlit web app for real-time predictions.  
+A deep learning project that classifies skin lesions as **benign** or **malignant** using a RestNet50 CNN and a custom focal loss function to handle class imbalance. Includes Grad-CAM visualizations for model explainability and a FastAPI-backed web app for real-time predictions.  
 
-### View the app here: -> [https://skin-lesion-class.streamlit.app/](https://skin-lesion-class.streamlit.app/)
+### View the app here: -> [https://skin-lesion-class.rayyanhuda.com](https://skin-lesion-class.rayyanhuda.com)
 
 
 ## Project Overview
@@ -12,19 +12,27 @@ A ResNet50 backbone was fine-tuned on the
 
 To make the model interpretable, I implemented Grad-CAM (Gradient-weighted Class Activation Mapping), which highlights the regions of each image that are most influential to the model's decision.  
 
-A Streamlit web app was developed to enable users to upload lesion images, view classification results, and interactively visualize Grad-CAM heatmaps.  
+A FastAPI backend serves the model and a hand-coded HTML/CSS/JS frontend lets users upload lesion images, view classification results, and interactively visualize Grad-CAM heatmaps.  
 
 ## Tech Stack
 - Deep Learning: TensorFlow, Keras (ResNet50, custom focal loss)
-- Data Processing: NumPy, Pandas
-- Visualization: Matplotlib, OpenCV
-- App Deployment: Streamlit
+- Data Processing: NumPy
+- Visualization: OpenCV
+- App: FastAPI backend + static HTML/CSS/JS frontend, deployed as a single service on Render
 - Environment: Google Colab + Google Drive (mount)
 
 ## How to Run
-Upload a skin lesion image (`.jpg`, `.jpeg`, or `.png`) and view:
+
+```bash
+python3.11 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn backend.main:app --reload --port 8000
+```
+
+Then open `http://localhost:8000` and upload a skin lesion image (`.jpg`, `.jpeg`, or `.png`) to view:
 - Model prediction (Benign or Malignant)
-- Prediction accuracy
+- Prediction certainty and malignancy probability
 - Grad-CAM heatmap
 - Overlay visualization
 
