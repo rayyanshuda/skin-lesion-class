@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import io
 from contextlib import asynccontextmanager
@@ -11,14 +12,26 @@ from backend.inference import process_image, load_model
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png"}
 
 
+async def _load_model_in_background(app: FastAPI):
+    loop = asyncio.get_event_loop()
+    try:
+        app.state.model = await loop.run_in_executor(None, load_model)
+    except Exception as e:
+        app.state.model_error = str(e)
+    finally:
+        app.state.model_loading = False
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    try:
-        app.state.model = load_model()
-        app.state.model_error = None
-    except Exception as e:
-        app.state.model = None
-        app.state.model_error = str(e)
+    # Loading TensorFlow + ResNet50 can take long enough that a platform's
+    # startup health check gives up and restarts the container before the
+    # model finishes loading -- so start serving requests immediately and
+    # load the model in the background instead of blocking startup on it.
+    app.state.model = None
+    app.state.model_error = None
+    app.state.model_loading = True
+    asyncio.create_task(_load_model_in_background(app))
     yield
 
 
@@ -30,6 +43,7 @@ async def health():
     return {
         "status": "ok",
         "model_loaded": app.state.model is not None,
+        "model_loading": app.state.model_loading,
         **({"error": app.state.model_error} if app.state.model_error else {}),
     }
 
@@ -44,6 +58,8 @@ def _encode_image(img_array, quality: int = 85) -> str:
 @app.post("/api/predict")
 async def predict(file: UploadFile = File(...)):
     if app.state.model is None:
+        if app.state.model_loading:
+            raise HTTPException(status_code=503, detail="Model is still loading, please try again shortly.")
         raise HTTPException(status_code=503, detail=f"Model unavailable: {app.state.model_error}")
 
     extension = (file.filename or "").rsplit(".", 1)[-1].lower()
