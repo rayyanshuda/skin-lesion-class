@@ -1,117 +1,130 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Skin Lesion Classifier</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="/style.css" />
-</head>
-<body>
-  <div class="grid-backdrop"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skin Lesion Classifier</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="grid-backdrop"></div>
 
-  <main class="page">
-    <header class="page-header">
-      <h1>Skin Lesion Classifier</h1>
-      <p class="label">Upload a skin lesion image for AI analysis</p>
-    </header>
+    <main class="page">
+      <header class="page-header">
+        <h1>Skin Lesion Classifier</h1>
+        <p class="label">Upload a skin lesion image for AI analysis</p>
+      </header>
 
-    <div class="surface surface--brick" role="alert">
-      <strong>Medical Disclaimer:</strong> This is a research prototype only.
-      NOT for medical diagnosis. Always consult healthcare professionals for medical advice.
+      <div class="surface surface--brick" role="alert">
+        <strong>Medical Disclaimer:</strong> This is a research prototype only.
+        NOT for medical diagnosis. Always consult healthcare professionals for
+        medical advice.
+      </div>
+
+      <section class="upload-section">
+        <div id="model-status-banner" class="surface" hidden></div>
+        <label
+          for="file-input"
+          class="dropzone"
+          title="Upload a clear image of the skin lesion"
+        >
+          <span class="dropzone-title">Choose an image file</span>
+          <span class="label">JPG, JPEG, OR PNG</span>
+        </label>
+        <input type="file" id="file-input" accept=".jpg,.jpeg,.png" hidden />
+        <p id="usage-status" class="label usage-status" hidden></p>
+        <p id="status" class="label status" hidden>Analyzing image&hellip;</p>
+        <div id="error-banner" class="surface surface--brick" hidden></div>
+      </section>
+
+      <section id="results" hidden>
+        <div class="results-grid">
+          <div class="results-col">
+            <h2 class="divider-bottom">Prediction Results</h2>
+            <div id="prediction-badge" class="surface"></div>
+
+            <div class="metrics-row">
+              <div
+                class="card metric"
+                title="How confident the model is in its prediction. Higher values mean the model is more sure of its decision. Calculated as the distance from 50% uncertainty."
+              >
+                <div class="label">Model Certainty</div>
+                <div class="metric-value" id="certainty-value">&mdash;</div>
+              </div>
+              <div
+                class="card metric"
+                title="Raw probability that the lesion is malignant. Values near 0% suggest benign, values near 100% suggest malignant, values near 50% indicate uncertainty."
+              >
+                <div class="label">Malignancy Probability</div>
+                <div class="metric-value" id="confidence-value">&mdash;</div>
+              </div>
+            </div>
+
+            <div id="certainty-banner" class="surface"></div>
+          </div>
+
+          <div class="results-col results-col--wide">
+            <h2 class="divider-bottom">Visual Analysis</h2>
+            <div class="gallery">
+              <figure class="card">
+                <img id="img-original" alt="Original uploaded image" />
+                <figcaption class="label">Original Image</figcaption>
+              </figure>
+              <figure class="card">
+                <img id="img-heatmap" alt="Grad-CAM heatmap" />
+                <figcaption class="label">Grad-CAM Heatmap</figcaption>
+              </figure>
+              <figure class="card">
+                <img id="img-overlay" alt="Heatmap overlay" />
+                <figcaption class="label">Overlay</figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+
+        <div class="explanation">
+          <h3 class="divider-bottom">What is the AI looking at?</h3>
+          <p>
+            The <strong>Grad-CAM heatmap</strong> shows which parts of the image
+            the AI focused on:
+          </p>
+          <ul>
+            <li>
+              <strong>Red areas</strong>: High importance for the prediction
+            </li>
+            <li><strong>Yellow areas</strong>: Moderate importance</li>
+            <li><strong>Blue areas</strong>: Low importance (background)</li>
+          </ul>
+          <p>Good AI should focus on medically relevant features like:</p>
+          <ul>
+            <li>Lesion borders and shape irregularities</li>
+            <li>Color variations within the lesion</li>
+            <li>Texture and surface characteristics</li>
+          </ul>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <p class="label">
+          <a href="https://rayyanhuda.com/">rayyanhuda.com</a> &middot;
+          <a href="https://www.linkedin.com/in/rayyanhuda/">LinkedIn</a>
+          &middot;
+          <a href="https://github.com/rayyanshuda/skin-lesion-class">GitHub</a>
+        </p>
+      </footer>
+    </main>
+
+    <div id="lightbox" class="lightbox" hidden>
+      <button class="lightbox-close" aria-label="Close">&times;</button>
+      <img id="lightbox-img" alt="" />
     </div>
 
-    <section class="upload-section">
-      <label for="file-input" class="dropzone" title="Upload a clear image of the skin lesion">
-        <span class="dropzone-title">Choose an image file</span>
-        <span class="label">JPG, JPEG, OR PNG</span>
-      </label>
-      <input type="file" id="file-input" accept=".jpg,.jpeg,.png" hidden />
-      <p id="status" class="label status" hidden>Analyzing image&hellip;</p>
-      <div id="error-banner" class="surface surface--brick" hidden></div>
-    </section>
-
-    <section id="results" hidden>
-      <div class="results-grid">
-        <div class="results-col">
-          <h2 class="divider-bottom">Prediction Results</h2>
-          <div id="prediction-badge" class="surface"></div>
-
-          <div class="metrics-row">
-            <div
-              class="card metric"
-              title="How confident the model is in its prediction. Higher values mean the model is more sure of its decision. Calculated as the distance from 50% uncertainty."
-            >
-              <div class="label">Model Certainty</div>
-              <div class="metric-value" id="certainty-value">&mdash;</div>
-            </div>
-            <div
-              class="card metric"
-              title="Raw probability that the lesion is malignant. Values near 0% suggest benign, values near 100% suggest malignant, values near 50% indicate uncertainty."
-            >
-              <div class="label">Malignancy Probability</div>
-              <div class="metric-value" id="confidence-value">&mdash;</div>
-            </div>
-          </div>
-
-          <div id="certainty-banner" class="surface"></div>
-        </div>
-
-        <div class="results-col results-col--wide">
-          <h2 class="divider-bottom">Visual Analysis</h2>
-          <div class="gallery">
-            <figure class="card">
-              <img id="img-original" alt="Original uploaded image" />
-              <figcaption class="label">Original Image</figcaption>
-            </figure>
-            <figure class="card">
-              <img id="img-heatmap" alt="Grad-CAM heatmap" />
-              <figcaption class="label">Grad-CAM Heatmap</figcaption>
-            </figure>
-            <figure class="card">
-              <img id="img-overlay" alt="Heatmap overlay" />
-              <figcaption class="label">Overlay</figcaption>
-            </figure>
-          </div>
-        </div>
-      </div>
-
-      <div class="explanation">
-        <h3 class="divider-bottom">What is the AI looking at?</h3>
-        <p>The <strong>Grad-CAM heatmap</strong> shows which parts of the image the AI focused on:</p>
-        <ul>
-          <li><strong>Red areas</strong>: High importance for the prediction</li>
-          <li><strong>Yellow areas</strong>: Moderate importance</li>
-          <li><strong>Blue areas</strong>: Low importance (background)</li>
-        </ul>
-        <p>Good AI should focus on medically relevant features like:</p>
-        <ul>
-          <li>Lesion borders and shape irregularities</li>
-          <li>Color variations within the lesion</li>
-          <li>Texture and surface characteristics</li>
-        </ul>
-      </div>
-    </section>
-
-    <footer class="page-footer">
-      <p class="label">
-        <a href="https://rayyanhuda.com/">rayyanhuda.com</a> &middot;
-        <a href="https://www.linkedin.com/in/rayyanhuda/">LinkedIn</a> &middot;
-        <a href="https://github.com/rayyanshuda">GitHub</a>
-      </p>
-    </footer>
-  </main>
-
-  <div id="lightbox" class="lightbox" hidden>
-    <button class="lightbox-close" aria-label="Close">&times;</button>
-    <img id="lightbox-img" alt="" />
-  </div>
-
-  <script src="/app.js"></script>
-</body>
+    <script src="/app.js"></script>
+  </body>
 </html>

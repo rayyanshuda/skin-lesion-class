@@ -168,6 +168,15 @@ h2.divider-bottom, h3.divider-bottom {
   margin-top: 12px;
 }
 
+.usage-status {
+  margin-top: 8px;
+}
+
+#model-status-banner {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
 /* results layout */
 .results-grid {
   display: grid;

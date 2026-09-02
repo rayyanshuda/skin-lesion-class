@@ -18,7 +18,7 @@ A FastAPI backend serves the model and a hand-coded HTML/CSS/JS frontend lets us
 - Deep Learning: TensorFlow, Keras (ResNet50, custom focal loss)
 - Data Processing: NumPy
 - Visualization: OpenCV
-- App: FastAPI backend + static HTML/CSS/JS frontend, deployed as a single service on Render
+- App: FastAPI backend + static HTML/CSS/JS frontend, deployed as a single service on Google Cloud Run
 - Environment: Google Colab + Google Drive (mount)
 
 ## How to Run

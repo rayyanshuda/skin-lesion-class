@@ -2,6 +2,8 @@ const fileInput = document.getElementById("file-input");
 const statusEl = document.getElementById("status");
 const errorBanner = document.getElementById("error-banner");
 const results = document.getElementById("results");
+const modelStatusBanner = document.getElementById("model-status-banner");
+const usageStatusEl = document.getElementById("usage-status");
 
 const predictionBadge = document.getElementById("prediction-badge");
 const certaintyValue = document.getElementById("certainty-value");
@@ -35,6 +37,88 @@ function formatPercent(value) {
   return `${(value * 100).toFixed(1)}%`;
 }
 
+// Two independent reasons the dropzone might need to be disabled: the model
+// isn't loaded yet, or this IP has used up its demo uploads. Track both so
+// neither one can accidentally re-enable it while the other still applies.
+let modelReady = true;
+let usageAvailable = true;
+
+function updateDropzoneState() {
+  fileInput.disabled = !(modelReady && usageAvailable);
+}
+
+function formatResetTime(resetAtSeconds) {
+  const resetDate = new Date(resetAtSeconds * 1000);
+  const diffMs = resetDate - Date.now();
+  if (diffMs <= 0) return "now";
+  const diffMinutes = Math.max(1, Math.ceil(diffMs / (1000 * 60)));
+  if (diffMinutes < 60) {
+    return `in ${diffMinutes} minute${diffMinutes === 1 ? "" : "s"}`;
+  }
+  const diffHours = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60)));
+  if (diffHours < 24) {
+    return `in ${diffHours} hour${diffHours === 1 ? "" : "s"}`;
+  }
+  return `on ${resetDate.toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" })}`;
+}
+
+function renderUsage(usage) {
+  if (typeof usage.remaining !== "number") return;
+
+  usageStatusEl.hidden = false;
+  if (usage.remaining > 0) {
+    usageStatusEl.textContent = `${usage.remaining} of ${usage.limit ?? usage.remaining} demo uploads remaining`;
+    usageAvailable = true;
+  } else {
+    usageStatusEl.textContent = `Demo limit reached — resets ${formatResetTime(usage.reset_at)}`;
+    usageAvailable = false;
+  }
+  updateDropzoneState();
+}
+
+async function checkUsageStatus() {
+  try {
+    const response = await fetch("/api/usage");
+    const data = await response.json();
+    renderUsage(data);
+  } catch (err) {
+    // Non-critical -- the limit is still enforced server-side even if this
+    // status display fails to load.
+  }
+}
+
+async function checkModelStatus() {
+  try {
+    const response = await fetch("/api/health");
+    const data = await response.json();
+
+    if (data.model_loaded) {
+      modelStatusBanner.hidden = true;
+      modelReady = true;
+      updateDropzoneState();
+      return;
+    }
+
+    if (data.error) {
+      modelStatusBanner.textContent = "The model failed to load. Please try again later.";
+      setSurfaceVariant(modelStatusBanner, "brick");
+      modelStatusBanner.hidden = false;
+      modelReady = false;
+      updateDropzoneState();
+      return;
+    }
+
+    modelStatusBanner.textContent = "Model is warming up — this can take up to a minute on a cold start.";
+    setSurfaceVariant(modelStatusBanner, "ochre");
+    modelStatusBanner.hidden = false;
+    modelReady = false;
+    updateDropzoneState();
+    setTimeout(checkModelStatus, 3000);
+  } catch (err) {
+    setTimeout(checkModelStatus, 3000);
+  }
+}
+
 function renderResults(data) {
   predictionBadge.innerHTML = `<strong>Prediction: ${data.prediction}</strong>`;
   setSurfaceVariant(predictionBadge, data.prediction === "Malignant" ? "brick" : "sage");
@@ -62,6 +146,7 @@ function renderResults(data) {
   imgOverlay.src = data.images.overlay;
 
   results.hidden = false;
+  renderUsage(data);
 }
 
 async function analyzeFile(file) {
@@ -83,6 +168,7 @@ async function analyzeFile(file) {
 
     if (!response.ok) {
       showError(data.detail || "Something went wrong while analyzing the image.");
+      renderUsage(data);
       return;
     }
 
@@ -91,7 +177,7 @@ async function analyzeFile(file) {
     showError("Could not reach the server. Please try again.");
   } finally {
     statusEl.hidden = true;
-    fileInput.disabled = false;
+    updateDropzoneState();
   }
 }
 
@@ -133,3 +219,6 @@ document.addEventListener("keydown", (event) => {
     closeLightbox();
   }
 });
+
+checkModelStatus();
+checkUsageStatus();
